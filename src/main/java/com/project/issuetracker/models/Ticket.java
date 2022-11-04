@@ -1,6 +1,11 @@
 package com.project.issuetracker.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -9,17 +14,23 @@ public class Ticket {
     @GeneratedValue
     @Column(name = "id")
     private Integer id;
+    @NotNull
     private String title;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User assignedUser;
+    @NotNull
     private String description;
     private String submittedBy;
     private String status;
     private String priority;
     private String type;
+    @CreationTimestamp
     private Date createdAt;
+    @UpdateTimestamp
     private Date updatedAt;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
@@ -30,12 +41,10 @@ public class Ticket {
     //Comments and attachments
 
 
-    public Ticket(String title, String description, String priority, Date createdAt, Date updatedAt) {
+    public Ticket(String title, String description, Date createdAt) {
         this.title = title;
         this.description = description;
-        this.priority = priority;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Ticket(){
@@ -128,5 +137,11 @@ public class Ticket {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    //utility
+    public void assignTicketToUser(User user) {
+        this.assignedUser = user;
+        user.getTickets().add(this);
     }
 }

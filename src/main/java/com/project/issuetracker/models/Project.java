@@ -1,6 +1,11 @@
 package com.project.issuetracker.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,11 +15,14 @@ public class Project {
     @GeneratedValue
     @Column(name = "id")
     private Integer id;
+    @NotNull
     private String name;
+    @NotNull
     private String description;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "projects")
-    private List<User> assignedUsers;
+    private List<User> assignedUsers = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project")
     private List<Ticket> tickets;
 
@@ -65,6 +73,17 @@ public class Project {
 
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+    //utility
+    public void assignProjectToUser(User user){
+        this.assignedUsers.add(user);
+        user.getProjects().add(this);
+    }
+
+    public void assignProjectToTicket(Ticket ticket) {
+        this.tickets.add(ticket);
+        ticket.setProject(this);
     }
 
 }

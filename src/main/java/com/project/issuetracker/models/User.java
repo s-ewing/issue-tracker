@@ -1,7 +1,10 @@
 package com.project.issuetracker.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,15 +16,15 @@ public class User {
     @GeneratedValue
     @Column(name = "id")
     private Integer id;
-
+    @NotNull
     private String email;
-
+    @NotNull
     private String password;
-
+    @NotNull
     private String name;
 
     private Integer role;
-
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_project",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -31,6 +34,17 @@ public class User {
     public List<Project> getProjects() {
         return projects;
     }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    @OneToMany(mappedBy = "assignedUser")
+    public List<Ticket> tickets = new ArrayList<>();
 
     public void setProjects(List<Project> projects) {
         this.projects = projects;
@@ -85,4 +99,5 @@ public class User {
     public void setRole(Integer role) {
         this.role = role;
     }
+
 }
